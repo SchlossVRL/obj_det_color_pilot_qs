@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Schloss Lab Experiment</title>
+    <!-- Load in the jspsych tools, plugins,and layout -->
+    <script src="jsPsych/jspsych.js"></script>
+
+    <script src="jsPsych/jspsych-image-slider-response_InstrMAS.js"></script>
+    <script src="jsPsych/plugin-image-slider-response.js"></script>
+    <script src="jsPsych/plugin-html-slider-response.js"></script>
+    <script src="jsPsych/jspsych-image-slider-responseKM.js"></script>
+    <script src="jsPsych/plugin-html-button-response.js"></script>
+    <script src="jsPsych/plugin-html-keyboard-response.js"></script>
+    <script src="jsPsych/plugin-survey-html-form.js"></script>
+    <script src="jsPsych/plugin-survey-multi-select.js"></script>
+    <script src="jsPsych/plugin-survey-multi-choice.js"></script>
+    <script src="jsPsych/plugin-survey-text.js"></script>
+    <script src="jsPsych/plugin-fullscreen.js"></script>
+    <script src="jsPsych/plugin-preload.js"></script>
+    <!-- <script src="imagePaths.js"></script> -->
+    <link href="jsPsych/jspsych.css" rel="stylesheet" type="text/css">
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.1/underscore-min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+
+
+</head>
+
+<body>
+
+
+    <!--------------------- Here is where the experiment is created ------------------------------------------->
+    <script>
+
+
+
+
+        async function createExperiment() {
+
+            var jsPsych = initJsPsych({
+                on_finish: function () {
+                    jsPsych.data.get().localSave("csv", filename);
+                }
+            }
+            );
+            var timeline = [];
+
+            const subject_id = jsPsych.randomization.randomID(10);
+            const filename = `${subject_id}.csv`;
+
+            // Set background color to gray //
+            document.body.style.backgroundColor = "rgb(128,128,128)"
+
+            // Initial welcome screen
+            var initial_screen = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: 'Thank you for participating in our experiment! Now that you have completed all of the study trials we have a few questions for you about the experiment.' +
+                    '<p>At the bottom of this screen, you will see a button that says "Begin Questionnaire".' +
+                    '<br>Please click that button when you are ready to complete brief questionnaire.</p>',
+                choices: ['Begin Questionnaire']
+            }
+            timeline.push(initial_screen);
+            let preload_trial = {
+                type: jsPsychPreload,
+            }
+            timeline.push(preload_trial);
+
+            timeline.push({
+                type: jsPsychFullscreen,
+                fullscreen_mode: true,
+            })
+
+            //let id_value = "unknown";
+            //let filename = "unknown_debrief_qs.csv";
+
+            var participant_id = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: "(Experimenter) Please enter the participant ID:" }
+                ] //,
+                /*on_finish: function (data) {
+                    // Get the participant ID from the response
+                    id_value = data.response ? Object.values(data.response)[0] : "unknown";
+                    
+                    filename = `${id_value}_debrief_qs.csv`;
+                }*/
+            }
+
+            timeline.push(participant_id);
+
+            //const filename = `${id}_debrief_qs.csv`;
+
+            // Overview instructions of experiment
+            var overview_instructions = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: 'This questionnaire has 5 brief questions.' +
+                    '<p> It will take about 5 minutes to complete.' +
+                    '<p> Please respond to each question to the best of your ability by typing your response in the text box provided.',
+                choices: ['Continue']
+            }
+            timeline.push(overview_instructions);
+
+            var Q1 = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: '<div style="text-align:left;">In this experiment we showed you images and asked you which side of each image you perceived as the figure. You pressed the arrow key which corresponded to the side of the image you perceived as the figure. On what percentage of trials would you estimate you accidentally pressed a different key than you intended?</div>', name: "errors" }
+                ],
+                button_label: "Submit Response",
+                on_finish: function (data) {
+                    // Save the responses to the debrief questions
+                    var responses = data.response;
+                    console.log("Debrief Responses:", responses);
+                }
+            }
+
+            timeline.push(Q1);
+
+            var Q2 = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: '<div style="text-align:left;">In the images you saw, did you recognize any shapes as familiar objects?</div>', name: "recognize" }
+                ],
+                button_label: "Submit Response",
+                on_finish: function (data) {
+                    // Save the responses to the debrief questions
+                    var responses = data.response;
+                    console.log("Debrief Responses:", responses);
+                }
+            }
+
+            timeline.push(Q2);
+
+            var Q3 = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: '<div style="text-align:left;">If you recognized shapes, what were they? Please list any you remember (if none of the shapes were recognizable, please write N/A):</div>', name: "list_shapes" }
+                ],
+                button_label: "Submit Response",
+                on_finish: function (data) {
+                    // Save the responses to the debrief questions
+                    var responses = data.response;
+                    console.log("Debrief Responses:", responses);
+                }
+            }
+
+            timeline.push(Q3);
+
+            var Q4 = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: '<div style="text-align:left;">Were any of the colors you saw related to the shapes in the images you judged?</div>', name: "color_relationship" }
+                ],
+                button_label: "Submit Response",
+                on_finish: function (data) {
+                    // Save the responses to the debrief questions
+                    var responses = data.response;
+                    console.log("Debrief Responses:", responses);
+                }
+            }
+
+            timeline.push(Q4);
+
+            var Q5 = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: '<div style="text-align:left;">If there was a relationship between the colors and shapes please describe (if there was not any relationship, please write N/A):</div>', name: "describe_relationship" }
+                ],
+                button_label: "Submit Response",
+                on_finish: function (data) {
+                    // Save the responses to the debrief questions
+                    var responses = data.response;
+                    console.log("Debrief Responses:", responses);
+                }
+            }
+
+            timeline.push(Q5);
+
+            /*var debrief_questions = {
+                type: jsPsychSurveyText,
+                questions: [
+                    { prompt: "In this experiment we showed you images and asked you which side of each image you perceived as the figure. You pressed the arrow key which corresponded to the side of the image you perceived as the figure. On what percentage of trials would you estimate you accidentally pressed a different key than you intended?", name: "errors" },
+                    { prompt: "In the images you saw, did you recognize any shapes as familiar objects?", name: "recognize" },
+                    { prompt: "If you recognized shapes, what were they? Please list any you remember (if none of the shapes were recognizable, please write N/A):", name: "list_shapes" },
+                    { prompt: "Were any of the colors you saw related to the shapes in the images you judged?", name: "color_relationship" },
+                    { prompt: "If there was a relationship between the colors and shapes please describe (if there was not any relationship, please write N/A):", name: "describe_reltionship" }
+
+                ],
+                button_label: "Submit Responses",
+                on_finish: function (data) {
+                    // Save the responses to the debrief questions
+                    var responses = data.response;
+                    console.log("Debrief Responses:", responses);
+                }
+            }
+
+            timeline.push(debrief_questions);*/
+
+
+
+            const save_data = {
+                type: jsPsychPipe,
+                action: "save",
+                experiment_id: "y0BIgtQMxToP",
+                filename: filename,
+                data_string: () => jsPsych.data.get().csv()
+            };
+            timeline.push(save_data);
+
+            jsPsych.run(timeline);
+        }
+
+        createExperiment();
+
+
+    </script>
+</body>
+
+</html> 
